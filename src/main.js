@@ -3,9 +3,12 @@ const canvas = /** @type {HTMLCanvasElement} */ (
 );
 const btnStart = document.querySelector("#start");
 const btnStop = document.querySelector("#pause");
+const div = document.querySelector("#gameOver");
+const btnGameOver = document.querySelector("#btnGameOver");
+const divbuttonsGame = document.querySelector("#buttonsGame");
 
 const context = canvas.getContext("2d");
-const cell = 25;
+const grid = 25;
 const fieldW = canvas.clientWidth;
 const fieldH = canvas.clientHeight;
 let gameOver = null;
@@ -13,19 +16,17 @@ let isStart = false;
 let lastEvent = null;
 let xDirection = 0;
 let yDirection = 0;
+let score = 0;
+divbuttonsGame.hidden = false;
 
-const snakeHead = {
+const snake = {
   x: 250,
   y: 250,
+  dx: grid,
+  dy: 0,
+  cells: [],
+  maxCells: 1,
 };
-
-const snakeBody = {
-  x: null,
-  y: null,
-};
-
-const snakeTail = [snakeHead];
-let tailLength = 1;
 
 const apple = {
   x: 300,
@@ -38,43 +39,57 @@ btnStart.addEventListener("click", () => {
 });
 
 btnStop.addEventListener("click", () => {
-  isStart = false;
-  gameOver = true;
+  game_over();
 });
 
-document.addEventListener("keydown", keydown);
-
-function keydown(e) {
-  if (e.key === "ArrowDown") {
-    // console.log("down");
-    if (yDirection == -cell) return;
-    yDirection = cell;
-    xDirection = 0;
+document.addEventListener("keydown", (e) => {
+  if (
+    (e.key === "ArrowDown" || e.key === "s" || e.key === "ы") &&
+    snake.dy !== -grid
+  ) {
     lastEvent = "down";
   }
 
-  if (e.key === "ArrowUp") {
-    // console.log("up");
-    if (yDirection == cell) return;
-    yDirection = -cell;
-    xDirection = 0;
+  if (
+    (e.key === "ArrowUp" || e.key === "w" || e.key === "ц") &&
+    snake.dy !== grid
+  ) {
     lastEvent = "up";
   }
 
-  if (e.key === "ArrowRight") {
-    if (xDirection == -cell) return;
-    // console.log("right");
-    yDirection = 0;
-    xDirection = cell;
+  if (
+    (e.key === "ArrowRight" || e.key === "d" || e.key === "в") &&
+    snake.dx !== -grid
+  ) {
     lastEvent = "right";
   }
 
-  if (e.key === "ArrowLeft") {
-    if (xDirection == cell) return;
-    // console.log("left");
-    yDirection = 0;
-    xDirection = -cell;
+  if (
+    (e.key === "ArrowLeft" || e.key === "a" || e.key === "ф") &&
+    snake.dx !== grid
+  ) {
     lastEvent = "left";
+  }
+});
+
+function eventCatch() {
+  if (lastEvent === "down") {
+    snake.dy = grid;
+    snake.dx = 0;
+  }
+
+  if (lastEvent === "up") {
+    snake.dy = -grid;
+    snake.dx = 0;
+  }
+
+  if (lastEvent === "right") {
+    snake.dy = 0;
+    snake.dx = grid;
+  }
+  if (lastEvent === "left") {
+    snake.dy = 0;
+    snake.dx = -grid;
   }
 }
 
@@ -88,67 +103,97 @@ function clearScreen() {
 }
 
 function drawSnake() {
-  context.fillStyle = "green";
-  for (let i = 0; i < snakeTail.length; i++) {
-    let body = snakeTail[i];
-    context.fillRect(body.x, body.y, cell, cell);
-    if (snakeTail.length < tailLength) {
-      snakeTail.push(snakeBody);
+  context.fillStyle = "#f89d13";
+
+  snake.cells.forEach((cell, index) => {
+    if (index === 0) {
+      context.fillStyle = "#f89d13";
+    } else {
+      context.fillStyle = "green";
     }
-  }
+    context.fillRect(cell.x, cell.y, grid - 1, grid - 1);
+
+    for (let i = index + 1; i < snake.cells.length; i++) {
+      if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+        game_over();
+      }
+    }
+  });
 }
 
 function getRandomNumberOf25() {
-  const randomStep = Math.floor(Math.random() * 21);
+  const randomStep = Math.floor(Math.random() * 20);
   return randomStep * 25;
 }
 
 function getRandomApple() {
-  apple.x = getRandomNumberOf25();
-  apple.y = getRandomNumberOf25();
+  while (snake.cells.find((cell) => cell.x === apple.x && cell.y === apple.y)) {
+    apple.x = getRandomNumberOf25();
+    apple.y = getRandomNumberOf25();
+  }
 }
 
 function drawApple() {
   context.fillStyle = "red";
-  context.fillRect(apple.x, apple.y, cell, cell);
-  // console.log(apple.x, apple.y)
+  context.fillRect(apple.x, apple.y, grid - 1, grid - 1);
 }
 
+function drawScore() {
+  context.fillStyle = "white";
+  context.font = "10px verdana";
+  context.fillText("Счёт: " + score, canvas.clientWidth - 50, 10);
+}
+
+function game_over() {
+  isStart = false;
+  gameOver = true;
+  div.hidden = false;
+  divbuttonsGame.hidden = true;
+  btnGameOver.addEventListener("click", () => window.location.reload());
+}
+
+//смена позиции змейки у границ поля
 function fieldBorder() {
-  if (snakeHead.x == canvas.clientWidth) {
-    snakeHead.x = 0;
+  if (snake.x === canvas.clientWidth) {
+    snake.x = 0;
   }
-  if (snakeHead.x == -25) {
-    snakeHead.x = 475;
+  if (snake.x === -25) {
+    snake.x = 475;
   }
-  if (snakeHead.y == canvas.clientHeight) {
-    snakeHead.y = 0;
+  if (snake.y === canvas.clientHeight) {
+    snake.y = 0;
   }
-  if (snakeHead.y == -25) {
-    snakeHead.y = 475;
+  if (snake.y === -25) {
+    snake.y = 475;
   }
 }
 
 //ловля событий
-function update(lastEvent) {
-  if (lastEvent) {
-    snakeHead.x = snakeHead.x + xDirection;
-    snakeHead.y = snakeHead.y + yDirection;
-    fieldBorder();
+function update() {
+  eventCatch();
+
+  snake.x += snake.dx;
+  snake.y += snake.dy;
+  fieldBorder();
+  snake.cells.unshift({ x: snake.x, y: snake.y });
+  if (snake.cells.length > snake.maxCells) {
+    snake.cells.pop();
   }
 
-  if (snakeHead.x == apple.x && snakeHead.y == apple.y) {
+  if (snake.x === apple.x && snake.y === apple.y) {
+    snake.maxCells++;
+    score++;
     getRandomApple();
-    tailLength++;
   }
 }
 
 //отрисовка игры
 function drawGame() {
   clearScreen();
+  update();
   drawApple();
   drawSnake();
-  update(lastEvent);
+  drawScore();
 }
 
 async function main() {
@@ -156,15 +201,6 @@ async function main() {
 
   while (true) {
     await sleep(200);
-    if (isStart && lastEvent === null) {
-      while (true) {
-        await sleep(200);
-        snakeHead.x += cell;
-        fieldBorder();
-        drawGame();
-        if (lastEvent) break;
-      }
-    }
     if (isStart) {
       drawGame();
     }
