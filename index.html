@@ -5,16 +5,21 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/favicon.png" rel="icon">
   <link href="/src/style.css" rel="stylesheet">
   <title>Snake</title>
 </head>
 
 <body class="m-2">
-  <div class="flex flex-col items-center">
-    <canvas width="300" height="300" class="border"></canvas>
-    <div class="flex gap-10">
-      <button type="button" class="border rounded-sm">Старт</button>
-      <button type="button" class="border rounded-sm">Пауза</button>
+  <div class="flex flex-col items-center gap-2 font-sans font-normal">
+    <canvas id="canvas" width="500" height="500" class="shadow-xl">It's not working!</canvas>
+    <div id="buttonsGame" class="flex gap-10" hidden>
+      <button id="start" type="button" class="btn">Старт</button>
+      <button id="pause" type="button" class="btn">Сдаться</button>
+    </div>
+    <div id="gameOver" class="flex flex-col items-center gap-2" hidden>
+      <p>Конец игры! Начать заново?</p>
+      <button id="btnGameOver" type="button" class="btn">Да</button>
     </div>
   </div>
   <script type="module" src="/src/main.js"></script>
