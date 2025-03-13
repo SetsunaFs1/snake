@@ -1,17 +1,19 @@
-const canvas = /** @type {HTMLCanvasElement} */ (
-  document.querySelector("#canvas")
-);
+"use strict";
+/** @type {HTMLCanvasElement} */
+const canvas = document.querySelector("#canvas");
 const btnStart = document.querySelector("#start");
 const btnStop = document.querySelector("#pause");
 const div = document.querySelector("#gameOver");
 const btnGameOver = document.querySelector("#btnGameOver");
 const divbuttonsGame = document.querySelector("#buttonsGame");
 
-const context = canvas.getContext("2d");
-const grid = 25;
-const fieldW = canvas.clientWidth;
-const fieldH = canvas.clientHeight;
-let gameOver = null;
+const CONTEXT = canvas.getContext("2d");
+const GRID = 25;
+const FIELD_W = canvas.clientWidth;
+const FIELD_H = canvas.clientHeight;
+const SNAKE_HEAD_COLOR = "#f89d13";
+const SNAKE_BODY_COLOR = "green";
+let gameOverBoolean = null;
 let isStart = false;
 let lastEvent = null;
 let xDirection = 0;
@@ -22,7 +24,7 @@ divbuttonsGame.hidden = false;
 const snake = {
   x: 250,
   y: 250,
-  dx: grid,
+  dx: GRID,
   dy: 0,
   cells: [],
   maxCells: 1,
@@ -45,28 +47,28 @@ btnStop.addEventListener("click", () => {
 document.addEventListener("keydown", (e) => {
   if (
     (e.key === "ArrowDown" || e.key === "s" || e.key === "ы") &&
-    snake.dy !== -grid
+    snake.dy !== -GRID
   ) {
     lastEvent = "down";
   }
 
   if (
     (e.key === "ArrowUp" || e.key === "w" || e.key === "ц") &&
-    snake.dy !== grid
+    snake.dy !== GRID
   ) {
     lastEvent = "up";
   }
 
   if (
     (e.key === "ArrowRight" || e.key === "d" || e.key === "в") &&
-    snake.dx !== -grid
+    snake.dx !== -GRID
   ) {
     lastEvent = "right";
   }
 
   if (
     (e.key === "ArrowLeft" || e.key === "a" || e.key === "ф") &&
-    snake.dx !== grid
+    snake.dx !== GRID
   ) {
     lastEvent = "left";
   }
@@ -74,22 +76,22 @@ document.addEventListener("keydown", (e) => {
 
 function eventCatch() {
   if (lastEvent === "down") {
-    snake.dy = grid;
+    snake.dy = GRID;
     snake.dx = 0;
   }
 
   if (lastEvent === "up") {
-    snake.dy = -grid;
+    snake.dy = -GRID;
     snake.dx = 0;
   }
 
   if (lastEvent === "right") {
     snake.dy = 0;
-    snake.dx = grid;
+    snake.dx = GRID;
   }
   if (lastEvent === "left") {
     snake.dy = 0;
-    snake.dx = -grid;
+    snake.dx = -GRID;
   }
 }
 
@@ -98,24 +100,22 @@ function sleep(ms) {
 }
 
 function clearScreen() {
-  context.fillStyle = "black";
-  context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+  CONTEXT.fillStyle = "black";
+  CONTEXT.fillRect(0, 0, FIELD_W, FIELD_H);
 }
 
 function drawSnake() {
-  context.fillStyle = "#f89d13";
-
   snake.cells.forEach((cell, index) => {
     if (index === 0) {
-      context.fillStyle = "#f89d13";
+      CONTEXT.fillStyle = SNAKE_HEAD_COLOR;
     } else {
-      context.fillStyle = "green";
+      CONTEXT.fillStyle = SNAKE_BODY_COLOR;
     }
-    context.fillRect(cell.x, cell.y, grid - 1, grid - 1);
+    CONTEXT.fillRect(cell.x, cell.y, GRID - 1, GRID - 1);
 
     for (let i = index + 1; i < snake.cells.length; i++) {
       if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-        game_over();
+        gameOver();
       }
     }
   });
@@ -134,19 +134,19 @@ function getRandomApple() {
 }
 
 function drawApple() {
-  context.fillStyle = "red";
-  context.fillRect(apple.x, apple.y, grid - 1, grid - 1);
+  CONTEXT.fillStyle = "red";
+  CONTEXT.fillRect(apple.x, apple.y, GRID - 1, GRID - 1);
 }
 
 function drawScore() {
-  context.fillStyle = "white";
-  context.font = "10px verdana";
-  context.fillText("Счёт: " + score, canvas.clientWidth - 50, 10);
+  CONTEXT.fillStyle = "white";
+  CONTEXT.font = "10px verdana";
+  CONTEXT.fillText("Счёт: " + score, FIELD_W - 50, 10);
 }
 
-function game_over() {
+function gameOver() {
   isStart = false;
-  gameOver = true;
+  gameOverBoolean = true;
   div.hidden = false;
   divbuttonsGame.hidden = true;
   btnGameOver.addEventListener("click", () => window.location.reload());
@@ -154,17 +154,17 @@ function game_over() {
 
 //смена позиции змейки у границ поля
 function fieldBorder() {
-  if (snake.x === canvas.clientWidth) {
+  if (snake.x === FIELD_W) {
     snake.x = 0;
   }
-  if (snake.x === -25) {
-    snake.x = 475;
+  if (snake.x === -GRID) {
+    snake.x = FIELD_W - GRID;
   }
-  if (snake.y === canvas.clientHeight) {
+  if (snake.y === FIELD_H) {
     snake.y = 0;
   }
-  if (snake.y === -25) {
-    snake.y = 475;
+  if (snake.y === -GRID) {
+    snake.y = FIELD_H - GRID;
   }
 }
 
@@ -204,7 +204,7 @@ async function main() {
     if (isStart) {
       drawGame();
     }
-    if (gameOver) break;
+    if (gameOverBoolean) break;
   }
 }
 
