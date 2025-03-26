@@ -12,7 +12,22 @@
 
 <body class="m-2">
   <div class="flex flex-col items-center gap-2 font-sans font-normal">
-    <canvas id="canvas" width="500" height="500" class="shadow-xl">It's not working!</canvas>
+    <div class="grid grid-cols-[1fr_500px_1fr] gap-20">
+      <canvas id="canvas" width="500" height="500" class="shadow-xl col-start-2">It's not working!</canvas>
+      <div class="col-start-3">
+        <h2>Таблица рекордов:</h2>
+        <table id="table" class="table">
+          <thead>
+            <tr>
+              <th>Место</th>
+              <th>Длина змейки</th>
+              <th>Дата попытки</th>
+            </tr>
+          </thead>
+          <tbody id="scoreTable"></tbody>
+        </table>
+      </div>
+    </div>
     <div id="buttonsGame" class="flex gap-10" hidden>
       <button id="start" type="button" class="btn">Старт</button>
       <button id="pause" type="button" class="btn">Сдаться</button>
@@ -22,7 +37,7 @@
       <button id="btnGameOver" type="button" class="btn">Да</button>
     </div>
   </div>
-  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>

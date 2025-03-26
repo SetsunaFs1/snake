@@ -18,3 +18,19 @@
         }
     }
 }
+
+.table {
+	width: 100%;
+	border: none;
+}
+.table thead th {
+	padding: 10px;
+	font-weight: 500;
+	border-top: 2px solid black;
+	border-bottom: 2px solid black;
+}
+.table tbody td {
+	padding: 10px;
+	font-size: 14px;
+	border-top: 1px solid black;
+}
